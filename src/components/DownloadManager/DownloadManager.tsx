@@ -17,6 +17,7 @@ const AdmZip = window.require('adm-zip')
 const os = window.require('os')
 const request = window.require('request')
 const exec = window.require('child_process').exec
+const ipcRenderer = window.require('electron').ipcRenderer;
 var execWin = window.require('child_process').execFile;
 //const Loader = window.require('halogen/PulseLoader');
 
@@ -87,20 +88,20 @@ export const DownloadManager: FC<DownloadManagerProps> = () => {
 
         // console.log('gettingVersions() =>')
         try {
-            request.get(options, (err: any, res: any, body: any) => {
-                let releases = JSON.parse(body)
-                console.log('releases', releases)
-                // for (let release of releases) {
-                //     //console.log('release version: ', release['tag_name'])
-                // }
-                if (releases[0]) {
-                    console.log('latestVersion?  ', releases[0]['tag_name'])
-                    //setLatestVersion(releases[0]['tag_name'])
-                    //console.log('returning REAL version value')
-                    setLatestVersion(releases[0]['tag_name'])
-                }
-                //console.log('latest version: ', latestVersion)
-            })
+            // request.get(options, (err: any, res: any, body: any) => {
+            //     let releases = JSON.parse(body)
+            //     console.log('releases', releases)
+            //     // for (let release of releases) {
+            //     //     //console.log('release version: ', release['tag_name'])
+            //     // }
+            //     if (releases[0]) {
+            //         console.log('latestVersion?  ', releases[0]['tag_name'])
+            //         //setLatestVersion(releases[0]['tag_name'])
+            //         //console.log('returning REAL version value')
+            //         setLatestVersion(releases[0]['tag_name'])
+            //     }
+            //     //console.log('latest version: ', latestVersion)
+            // })
         } catch (error) {
             // console.log('error: ', error)
         }
@@ -156,10 +157,17 @@ export const DownloadManager: FC<DownloadManagerProps> = () => {
                 console.log('data: ', data.toString())
             })
         }
-        
-
-        
     }
+
+    useEffect(() => {
+        const version = document.getElementById('version');
+    
+        ipcRenderer.send('app_version');
+        ipcRenderer.on('app_version', (event: any, arg: any) => {
+            ipcRenderer.removeAllListeners('app_version');
+            version!.innerText = 'Version ' + arg.version;
+        });
+    }, [])
 
     return (
         <div className="DownloadManager">
@@ -209,6 +217,7 @@ export const DownloadManager: FC<DownloadManagerProps> = () => {
 
                 <div className='bottom-info left launcher-text'>
                     <div>ALPHA LAUNCHER</div>
+                    <p id="version"></p>
                 </div>
                 
             </div>

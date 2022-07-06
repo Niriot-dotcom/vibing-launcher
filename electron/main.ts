@@ -4,6 +4,7 @@ import * as isDev from 'electron-is-dev'
 import installExtension, {
     REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer'
+import { autoUpdater } from 'electron-updater'
 
 let win: BrowserWindow | null = null
 
@@ -51,9 +52,14 @@ function createWindow() {
         .catch((err) => console.log('An error occurred: ', err))
 
     if (isDev) {
-        //win.webContents.openDevTools()
+        win.webContents.openDevTools()
     }
     win.setResizable(false);
+
+
+    win.once('ready-to-show', () => {
+        autoUpdater.checkForUpdatesAndNotify();
+    });
 }
 
 app.on('ready', createWindow)
@@ -79,3 +85,20 @@ ipcMain.on('minimize', () => {
 ipcMain.on('close', () => {
     app.quit()
 })
+
+ipcMain.on('app_version', (event) => {
+    event.sender.send('app_version', { version: app.getVersion() });
+});
+ipcMain.on('restart_app', () => {
+    autoUpdater.quitAndInstall();
+});
+autoUpdater.on('update-available', () => {
+    if (win !== null) {
+        win.webContents.send('update_available');
+    }
+});
+autoUpdater.on('update-downloaded', () => {
+    if (win !== null) {
+        win.webContents.send('update_downloaded');
+    }
+});
