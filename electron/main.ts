@@ -17,6 +17,7 @@ function createWindow() {
             contextIsolation: false,
         },
         frame: false,
+        resizable: false,
         //titleBarStyle: 'hidden'
     })
 
@@ -51,14 +52,14 @@ function createWindow() {
         .then((name) => console.log(`Added Extension:  ${name}`))
         .catch((err) => console.log('An error occurred: ', err))
 
-    if (isDev) {
+    // if (isDev) {
         win.webContents.openDevTools()
-    }
-    win.setResizable(false);
-
+    // }
 
     win.once('ready-to-show', () => {
-        autoUpdater.checkForUpdatesAndNotify();
+        autoUpdater.checkForUpdatesAndNotify().then((data) => {
+            console.log('updates and notify: ', data)
+        });
     });
 }
 
