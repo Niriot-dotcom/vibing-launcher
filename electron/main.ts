@@ -94,6 +94,7 @@ ipcMain.on('restart_app', () => {
 });
 autoUpdater.on('update-available', () => {
     if (win !== null) {
+        console.log("update-available!")
         win.webContents.send('update_available');
     }
 });
