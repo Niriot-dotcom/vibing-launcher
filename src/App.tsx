@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import launcherImage from './assets/launcher-imagen.png'
 import windowBackground from './assets/launcher-ventana.png'
 import bitmonLogo from './assets/logo bitmon.png'
@@ -16,23 +16,27 @@ function App() {
     const handleMinButton = () => {
         ipcRenderer.send('minimize')
     }
-
-    const notification = document.getElementById('notification')!;
-    const message = document.getElementById('message')!;
-    const restartButton = document.getElementById('restart-button')!;
     
     ipcRenderer.on('update_available', () => {
+        const notification = document.getElementById('notification')!;
+        const message = document.getElementById('message')!;
+
         ipcRenderer.removeAllListeners('update_available');
         message.innerText = 'A new update is available. Downloading now...';
         notification.classList.remove('hidden');
     });
     ipcRenderer.on('update_downloaded', () => {
+        const notification = document.getElementById('notification')!;
+        const message = document.getElementById('message')!;
+        const restartButton = document.getElementById('restart-button')!;
+
         ipcRenderer.removeAllListeners('update_downloaded');
         message.innerText = 'Update Downloaded. It will be installed on restart. Restart now?';
         restartButton.classList.remove('hidden');
         notification.classList.remove('hidden');
     });
     function closeNotification() {
+        const notification = document.getElementById('notification')!;
         notification.classList.add('hidden');
     }
     function restartApp() {
